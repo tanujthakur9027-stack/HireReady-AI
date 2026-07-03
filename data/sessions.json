@@ -1,0 +1,60 @@
+{
+  "profile": {
+    "name": "Tanuj",
+    "company": "Google",
+    "role": "AI Engineer",
+    "resume_uploaded": true
+  },
+
+  "statistics": {
+    "interviews_completed": 3,
+    "last_score": 81,
+    "best_score": 88,
+    "average_score": 79
+  },
+
+  "skills": {
+    "strengths": [
+      "Python",
+      "Machine Learning"
+    ],
+    "weaknesses": [
+      "SQL",
+      "Behavioral Questions"
+    ]
+  },
+
+  "latest_interview": {
+    "confidence": 78,
+    "communication": 80,
+    "technical": 65,
+    "behavioral": 72,
+    "overall_score": 82
+  },
+
+  "learning_plan": [
+    {
+      "day": 1,
+      "task": "Practice SQL JOIN queries"
+    },
+    {
+      "day": 2,
+      "task": "Solve 5 behavioral interview questions"
+    },
+    {
+      "day": 3,
+      "task": "Mock interview on system design"
+    }
+  ],
+
+  "history": [
+    {
+      "date": "2026-07-03",
+      "company": "Google",
+      "role": "AI Engineer",
+      "score": 82
+    }
+  ],
+
+  "messages": []
+}

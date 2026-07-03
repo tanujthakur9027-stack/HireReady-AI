@@ -1,0 +1,8 @@
+venv/
+__pycache_/
+*.pyc
+.env
+data/interviews/*.json
+.streamlit/
+.idea/
+.vscode/

@@ -1,0 +1,11 @@
+streamlit
+google-generativeai
+python-dotenv
+pypdf
+sqlalchemy
+chromadb
+pandas
+plotly
+networkx
+fastapi
+uvicorn
