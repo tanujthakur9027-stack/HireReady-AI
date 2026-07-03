@@ -2,11 +2,11 @@ streamlit
 google-genai
 python-dotenv
 pypdf
-cognee
+sqlalchemy
+chromadb
 pandas
 plotly
 networkx
 fastapi
 uvicorn
-sqlalchemy
-chromadb
+cognee
