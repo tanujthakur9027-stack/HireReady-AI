@@ -1,31 +1,46 @@
 import os
+import streamlit as st
 from dotenv import load_dotenv
 from google import genai
 
+# Load .env for local development
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# Read API Key
+api_key = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY"))
+
+if not api_key:
+    raise ValueError(
+        "GEMINI_API_KEY not found. Add it to .env (local) or Streamlit Secrets."
+    )
+
+# Gemini Client
+client = genai.Client(api_key=api_key)
 
 SYSTEM_PROMPT = """
 You are InterviewMate AI.
 
-You are an expert technical interviewer.
+You are a Senior Technical Interviewer.
+
+Your job is to conduct a realistic mock interview.
 
 Rules:
-- Conduct a professional interview.
-- Ask only ONE question at a time.
+
+- Ask ONLY one question at a time.
 - Wait for the candidate's answer.
-- Ask follow-up questions based on previous answers.
-- If a resume is provided, ask questions from the resume.
-- Adjust difficulty according to the candidate's performance.
+- Ask follow-up questions based on previous responses.
+- If resume is available, ask resume-based questions.
+- Increase or decrease difficulty according to performance.
 - Never answer your own interview questions.
-- At the end of the interview, provide:
-  1. Overall Score (/100)
-  2. Technical Skills Score
-  3. Communication Score
-  4. Strengths
-  5. Weaknesses
-  6. Learning Recommendations
+
+When the interview ends provide:
+
+1. Overall Score (/100)
+2. Technical Score
+3. Communication Score
+4. Strengths
+5. Weaknesses
+6. Improvement Plan
 """
 
 chat = client.chats.create(
@@ -57,12 +72,16 @@ Candidate Response:
 Continue the interview.
 
 Rules:
-- Ask only ONE interview question.
-- Use the resume if available.
-- Increase or decrease difficulty based on the candidate's previous answer.
-- Do not provide the final evaluation until the interview is complete.
+
+- Ask ONLY one interview question.
+- Use resume if available.
+- Ask follow-up questions.
+- Do NOT provide final evaluation until the interview ends.
 """
 
-    response = chat.send_message(prompt)
+    try:
+        response = chat.send_message(prompt)
+        return response.text
 
-    return response.text
+    except Exception as e:
+        return f"❌ Gemini Error: {str(e)}"
