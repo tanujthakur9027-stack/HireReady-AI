@@ -1,0 +1,230 @@
+[33mcommit fae575881db0a91044eca4d28a2ddaf4cc42c955[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author:     ba4351127-code <ba4351127@gmail.com>
+AuthorDate: Fri Jul 3 19:55:12 2026 +0530
+Commit:     ba4351127-code <ba4351127@gmail.com>
+CommitDate: Fri Jul 3 19:55:12 2026 +0530
+
+    Initial InterviewMate AI project
+
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c040691[m
+[1m--- /dev/null[m
+[1m+++ b/.gitignore[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32mvenv/[m
+[32m+[m[32m__pycache_/[m
+[32m+[m[32m*.pyc[m
+[32m+[m[32m.env[m
+[32m+[m[32mdata/interviews/*.json[m
+[32m+[m[32m.streamlit/[m
+[32m+[m[32m.idea/[m
+[32m+[m[32m.vscode/[m
+\ No newline at end of file[m
+[1mdiff --git a/README.md b/README.md[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2dcd3d1[m
+Binary files /dev/null and b/README.md differ
+[1mdiff --git a/app.py b/app.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..db8c85e[m
+[1m--- /dev/null[m
+[1m+++ b/app.py[m
+[36m@@ -0,0 +1,243 @@[m
+[32m+[m[32mimport streamlit as st[m
+[32m+[m[32mfrom gemini_service import ask_ai[m
+[32m+[m[32mfrom resume_parser import extract_resume[m
+[32m+[m[32mfrom session_manager import load_session, save_session[m
+[32m+[m
+[32m+[m[32m# ---------------- Page ---------------- #[m
+[32m+[m
+[32m+[m[32mst.set_page_config([m
+[32m+[m[32m    page_title="InterviewMate AI",[m
+[32m+[m[32m    page_icon="🎯",[m
+[32m+[m[32m    layout="wide"[m
+[32m+[m[32m)[m
+[32m+[m
+[32m+[m[32m# ---------------- Session Defaults ---------------- #[m
+[32m+[m
+[32m+[m[32mdefaults = {[m
+[32m+[m[32m    "started": False,[m
+[32m+[m[32m    "name": "",[m
+[32m+[m[32m    "role": "",[m
+[32m+[m[32m    "company": "",[m
+[32m+[m[32m    "resume": None,[m
+[32m+[m[32m    "resume_text": "",[m
+[32m+[m[32m    "messages": [][m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfor key, value in defaults.items():[m
+[32m+[m[32m    if key not in st.session_state:[m
+[32m+[m[32m        st.session_state[key] = value[m
+[32m+[m
+[32m+[m[32m# ===================================================[m
+[32m+[m[32m# HOME PAGE[m
+[32m+[m[32m# ===================================================[m
+[32m+[m
+[32m+[m[32mif not st.session_state.started:[m
+[32m+[m
+[32m+[m[32m    st.title("🎯 InterviewMate AI")[m
+[32m+[m[32m    st.subheader("The AI Interview Coach That Never Forgets")[m
+[32m+[m
+[32m+[m[32m    st.divider()[m
+[32m+[m
+[32m+[m[32m    col1, col2 = st.columns(2)[m
+[32m+[m
+[32m+[m[32m    with col1:[m
+[32m+[m
+[32m+[m[32m        name = st.text_input("👤 Your Name")[m
+[32m+[m
+[32m+[m[32m        role = st.selectbox([m
+[32m+[m[32m            "💼 Target Role",[m
+[32m+[m[32m            [[m
+[32m+[m[32m                "AI/ML Engineer",[m
+[32m+[m[32m                "Frontend Developer",[m
+[32m+[m[32m                "Backend Developer",[m
+[32m+[m[32m                "Full Stack Developer",[m
+[32m+[m[32m                "Data Scientist",[m
+[32m+[m[32m                "Cyber Security",[m
+[32m+[m[32m                "DevOps Engineer"[m
+[32m+[m[32m            ][m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    with col2:[m
+[32m+[m
+[32m+[m[32m        company = st.selectbox([m
+[32m+[m[32m            "🏢 Target Company",[m
+[32m+[m[32m            [[m
+[32m+[m[32m                "Google",[m
+[32m+[m[32m                "Microsoft",[m
+[32m+[m[32m                "Amazon",[m
+[32m+[m[32m                "Meta",[m
+[32m+[m[32m                "OpenAI",[m
+[32m+[m[32m                "Infosys",[m
+[32m+[m[32m                "TCS",[m
+[32m+[m[32m                "Startup"[m
+[32m+[m[32m            ][m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m        resume = st.file_uploader([m
+[32m+[m[32m            "📄 Upload Resume",[m
+[32m+[m[32m            type=["pdf"][m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    resume_text = ""[m
+[32m+[m
+[32m+[m[32m    if resume is not None:[m
+[32m+[m
+[32m+[m[32m        resume_text = extract_resume(resume)[m
+[32m+[m
+[32m+[m[32m        st.success("✅ Resume Uploaded Successfully")[m
+[32m+[m
+[32m+[m[32m    st.divider()[m
+[32m+[m
+[32m+[m[32m    if st.button("🚀 Start Interview", use_container_width=True):[m
+[32m+[m
+[32m+[m[32m        if name.strip() == "":[m
+[32m+[m[32m            st.warning("Please enter your name.")[m
+[32m+[m[32m            st.stop()[m
+[32m+[m
+[32m+[m[32m        previous_session = load_session(name)[m
+[32m+[m
+[32m+[m[32m        st.session_state.name = name[m
+[32m+[m[32m        st.session_state.role = role[m
+[32m+[m[32m        st.session_state.company = company[m
+[32m+[m[32m        st.session_state.resume = resume[m
+[32m+[m
+[32m+[m[32m        if previous_session:[m
+[32m+[m
+[32m+[m[32m            st.info("✅ Previous interview found. Restoring session...")[m
+[32m+[m
+[32m+[m[32m            st.session_state.messages = previous_session.get("messages", [])[m
+[32m+[m
+[32m+[m[32m            st.session_state.resume_text = previous_session.get([m
+[32m+[m[32m                "resume",[m
+[32m+[m[32m                resume_text[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m[32m        else:[m
+[32m+[m
+[32m+[m[32m            st.session_state.messages = [][m
+[32m+[m
+[32m+[m[32m            st.session_state.resume_text = resume_text[m
+[32m+[m
+[32m+[m[32m        st.session_state.started = True[m
+[32m+[m
+[32m+[m[32m        st.rerun()[m
+[32m+[m
+[32m+[m[32m# ===================================================[m
+[32m+[m[32m# INTERVIEW PAGE[m
+[32m+[m[32m# ===================================================[m
+[32m+[m
+[32m+[m[32melse:[m
+[32m+[m
+[32m+[m[32m    st.sidebar.title("👤 Candidate")[m
+[32m+[m
+[32m+[m[32m    st.sidebar.write(f"**Name:** {st.session_state.name}")[m
+[32m+[m[32m    st.sidebar.write(f"**Role:** {st.session_state.role}")[m
+[32m+[m[32m    st.sidebar.write(f"**Company:** {st.session_state.company}")[m
+[32m+[m
+[32m+[m[32m    if st.sidebar.button("🏠 Home"):[m
+[32m+[m
+[32m+[m[32m        st.session_state.started = False[m
+[32m+[m
+[32m+[m[32m        st.rerun()[m
+[32m+[m
+[32m+[m[32m    st.title("🎤 AI Mock Interview")[m
+[32m+[m
+[32m+[m[32m    # First Question[m
+[32m+[m
+[32m+[m[32m    if len(st.session_state.messages) == 0:[m
+[32m+[m
+[32m+[m[32m        intro = f"""[m
+[32m+[m[32mWelcome **{st.session_state.name}** 👋[m
+[32m+[m
+[32m+[m[32mToday we'll conduct a mock interview for the position of[m
+[32m+[m
+[32m+[m[32m**{st.session_state.role}**[m
+[32m+[m
+[32m+[m[32mat[m
+[32m+[m
+[32m+[m[32m**{st.session_state.company}**[m
+[32m+[m
+[32m+[m[32mLet's begin.[m
+[32m+[m
+[32m+[m[32m### Tell me about yourself.[m
+[32m+[m[32m"""[m
+[32m+[m
+[32m+[m[32m        st.session_state.messages.append([m
+[32m+[m[32m            {[m
+[32m+[m[32m                "role": "assistant",[m
+[32m+[m[32m                "content": intro[m
+[32m+[m[32m            }[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    # Display Chat[m
+[32m+[m
+[32m+[m[32m    for msg in st.session_state.messages:[m
+[32m+[m
+[32m+[m[32m        with st.chat_message(msg["role"]):[m
+[32m+[m
+[32m+[m[32m            st.markdown(msg["content"])[m
+[32m+[m
+[32m+[m[32m    # User Input[m
+[32m+[m
+[32m+[m[32m    prompt = st.chat_input("Type your answer...")[m
+[32m+[m
+[32m+[m[32m    if prompt:[m
+[32m+[m
+[32m+[m[32m        st.session_state.messages.append([m
+[32m+[m[32m            {[m
+[32m+[m[32m                "role": "user",[m
+[32m+[m[32m                "content": prompt[m
+[32m+[m[32m            }[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m        with st.chat_message("user"):[m
+[32m+[m[32m            st.markdown(prompt)[m
+[32m+[m
+[32m+[m[32m        profile = {[m
+
