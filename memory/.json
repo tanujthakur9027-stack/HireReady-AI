@@ -1,0 +1,24 @@
+{
+    "name": "",
+    "role": "AI/ML Engineer",
+    "company": "Google",
+    "resume": "",
+    "technical_score": 0,
+    "communication_score": 10,
+    "confidence_score": 10,
+    "strong_topics": [],
+    "weak_topics": [
+        "Self-introduction",
+        "Verbal communication skills",
+        "Understanding interview prompts"
+    ],
+    "mistakes": [
+        "Provided an invalid/incomplete response ('j') to the introductory question.",
+        "Did not properly introduce themselves or address the 'Tell me about yourself' prompt."
+    ],
+    "recommended_topics": [
+        "Crafting a compelling 'Tell me about yourself' story",
+        "Interview communication basics",
+        "Active listening and prompt comprehension"
+    ]
+}

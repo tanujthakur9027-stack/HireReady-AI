@@ -10,3 +10,11 @@ networkx
 fastapi
 uvicorn
 cognee
+speechrecognition
+gtts
+pydub
+streamlit-mic-recorder
+streamlit-webrtc
+opencv-python
+av
+streamlit-ace

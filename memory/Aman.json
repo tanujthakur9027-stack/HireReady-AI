@@ -1,0 +1,19 @@
+{
+    "name": "Aman",
+    "role": "AI/ML Engineer",
+    "company": "Google",
+    "resume": "",
+    "technical_score": 80,
+    "communication_score": 75,
+    "confidence_score": 82,
+    "strong_topics": [
+        "Python"
+    ],
+    "weak_topics": [
+        "SQL"
+    ],
+    "mistakes": [],
+    "recommended_topics": [
+        "DBMS"
+    ]
+}

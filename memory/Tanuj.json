@@ -1,0 +1,32 @@
+{
+    "name": "tanuj",
+    "role": "AI/ML Engineer",
+    "company": "Google",
+    "resume": "",
+    "technical_score": 10,
+    "communication_score": 20,
+    "confidence_score": 5,
+    "strong_topics": [],
+    "weak_topics": [
+        "String Manipulation Algorithms",
+        "Array Manipulation Algorithms",
+        "Sliding Window Technique",
+        "Binary Search (especially for logarithmic complexity problems)",
+        "Algorithm Design and Problem-Solving",
+        "Time Complexity Analysis"
+    ],
+    "mistakes": [
+        "Explicitly stated lack of knowledge for a fundamental algorithm problem.",
+        "Unable to describe an approach or thought process for a problem.",
+        "Requested to end the interview prematurely, indicating disengagement.",
+        "Lack of foundational knowledge in common algorithmic patterns."
+    ],
+    "recommended_topics": [
+        "Fundamental Data Structures (Arrays, Strings, Hash Maps)",
+        "Basic Algorithm Patterns (Two Pointers, Sliding Window)",
+        "Divide and Conquer Algorithms (e.g., Binary Search)",
+        "Practicing LeetCode Easy/Medium level problems to build confidence and understanding.",
+        "Understanding and articulating Time and Space Complexity.",
+        "Interview communication skills (e.g., asking clarifying questions, thinking out loud)."
+    ]
+}
