@@ -12,7 +12,11 @@ from services.compiler_service import run_python
 from services.coding_service import review_code
 
 # Camera (OpenCV)
-from services.camera_service import VideoProcessor
+try:
+    from services.camera_service import VideoProcessor
+    CAMERA_AVAILABLE = True
+except Exception:
+    CAMERA_AVAILABLE = False
 from streamlit_webrtc import webrtc_streamer
 
 # ==============================
