@@ -15,9 +15,7 @@ from services.coding_service import review_code
 try:
     from services.camera_service import VideoProcessor
     CAMERA_AVAILABLE = True
-except Exception as e:
-    import streamlit as st
-    st.warning(f"Camera disabled: {e}")
+except Exception :
     CAMERA_AVAILABLE = False
 from streamlit_webrtc import webrtc_streamer
 
@@ -658,16 +656,11 @@ else:
                 async_processing=True
             )
 
-            st.success(" Camera Running")
-            st.info("✔ Face Detection Active")
-
         else:
 
-            st.info(
-                " Camera feature is unavailable on Streamlit Cloud."
-            )
+            st.warning(" Camera feature is unavailable on this deployment.")
 
-        if len(st.session_state.messages) == 0:
+    if len(st.session_state.messages) == 0:
 
         st.session_state.messages.append(
 
