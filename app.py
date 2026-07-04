@@ -15,7 +15,9 @@ from services.coding_service import review_code
 try:
     from services.camera_service import VideoProcessor
     CAMERA_AVAILABLE = True
-except Exception:
+except Exception as e:
+    import streamlit as st
+    st.warning(f"Camera disabled: {e}")
     CAMERA_AVAILABLE = False
 from streamlit_webrtc import webrtc_streamer
 
@@ -644,28 +646,28 @@ else:
 
         st.subheader(" Live Camera")
 
-        webrtc_streamer(
+        if CAMERA_AVAILABLE:
 
-            key="camera",
+            webrtc_streamer(
+                key="camera",
+                video_processor_factory=VideoProcessor,
+                media_stream_constraints={
+                    "video": True,
+                    "audio": False
+                },
+                async_processing=True
+            )
 
-            video_processor_factory=VideoProcessor,
+            st.success(" Camera Running")
+            st.info("✔ Face Detection Active")
 
-            media_stream_constraints={
+        else:
 
-                "video": True,
+            st.info(
+                " Camera feature is unavailable on Streamlit Cloud."
+            )
 
-                "audio": False
-
-            },
-
-            async_processing=True
-
-        )
-        st.success(" Camera Running")
-
-    st.info("✔ Face Detection Active")
-
-    if len(st.session_state.messages) == 0:
+        if len(st.session_state.messages) == 0:
 
         st.session_state.messages.append(
 
