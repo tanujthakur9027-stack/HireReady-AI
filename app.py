@@ -429,114 +429,73 @@ if not st.session_state.started:
 else:
 
     voice_mode = st.session_state.voice_mode
-
     camera_mode = st.session_state.camera_mode
-
     coding_round = st.session_state.coding_round
+
+    # ==========================
+    # SIDEBAR
+    # ==========================
 
     st.sidebar.title("Interview Controls")
 
-if st.sidebar.button(" Home", use_container_width=True):
+    if st.sidebar.button("🏠 Home", use_container_width=True):
 
-    st.session_state.started = False
+        st.session_state.started = False
+        st.session_state.messages = []
+        st.session_state.question_count = 0
+        st.session_state.start_time = None
+        st.session_state.generated_question = ""
+        st.session_state.voice_mode = False
+        st.session_state.camera_mode = False
+        st.session_state.coding_round = False
 
-    st.session_state.messages = []
+        st.rerun()
 
-    st.session_state.question_count = 0
+    st.sidebar.write(f"👤 {st.session_state.name}")
+    st.sidebar.write(f"💼 {st.session_state.role}")
+    st.sidebar.write(f"🏢 {st.session_state.company}")
 
-    st.session_state.start_time = None
-
-    st.session_state.generated_question = ""
-
-    st.session_state.voice_mode = False
-
-    st.session_state.camera_mode = False
-
-    st.session_state.coding_round = False
-
-    st.rerun()
-
-    st.sidebar.write(
-
-        f" {st.session_state.name}"
-
-    )
-
-    st.sidebar.write(
-
-        f" {st.session_state.role}"
-
-    )
-
-    st.sidebar.write(
-
-        f" {st.session_state.company}"
-
-    )
-
-    avatar = get_avatar(
-
-        st.session_state.company
-
-    )
+    avatar = get_avatar(st.session_state.company)
 
     st.title(
-
         f"{avatar} {st.session_state.company} Interview"
-
     )
 
     elapsed = int(
-
-        time.time()
-
-        -
-
-        st.session_state.start_time
-
+        time.time() - st.session_state.start_time
     )
 
     c1, c2, c3 = st.columns(3)
 
     with c1:
-
         st.metric(
-
             "Time",
-
             f"{elapsed//60}:{elapsed%60:02}"
-
         )
 
     with c2:
-
         st.metric(
-
             "Questions",
-
             st.session_state.question_count
-
         )
 
     with c3:
-
         st.metric(
-
             "Progress",
-
             f"{min(st.session_state.question_count*10,100)}%"
-
         )
 
     st.progress(
-
         min(st.session_state.question_count*10,100)/100
-
     )
+
+    # ==========================
+    # CAMERA
+    # ==========================
 
     if camera_mode:
 
-        st.subheader(" Live Camera")
+        st.subheader("📷 Live Camera")
 
         if CAMERA_AVAILABLE:
 
@@ -552,11 +511,11 @@ if st.sidebar.button(" Home", use_container_width=True):
 
         else:
 
-            st.warning(" Camera feature is unavailable on this deployment.")
+            st.warning("Camera feature is unavailable.")
 
-    if len(st.session_state.messages) == 0:
+        if len(st.session_state.messages) == 0:
 
-        st.session_state.messages.append(
+         st.session_state.messages.append(
 
            {
 
