@@ -347,200 +347,80 @@ if not st.session_state.started:
         if start:
 
             if name.strip() == "":
-
                 st.warning("Please Enter Your Name")
-
                 st.stop()
 
             resume_text = ""
+            if interview_resume is not None:
+                resume_text = extract_resume(interview_resume)
 
-    if interview_resume is not None:
+            # -----------------------------------
+            # Resume vs JD Match
+            # -----------------------------------
+            if jd.strip() != "" and resume_text != "":
+                result = match_resume(resume_text, jd)
+                st.divider()
+                st.subheader(" Resume vs JD Match")
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.metric("Match Score", f"{result['score']}%")
+                    st.progress(result["score"] / 100)
+                with c2:
+                    st.write("### Missing Skills")
+                    if result["missing"]:
+                        for skill in result["missing"]:
+                            st.error(skill)
+                    else:
+                        st.success("No Missing Skills")
 
-        resume_text = extract_resume(interview_resume)
+            # -----------------------------------
+            # Load Previous Interview
+            # -----------------------------------
+            previous = load_session(name)
+            memory = load_memory(name)
 
-    # -----------------------------------
-    # Resume vs JD Match
-    # -----------------------------------
-
-    if jd.strip() != "" and resume_text != "":
-
-        result = match_resume(
-            resume_text,
-            jd
-        )
-
-        st.divider()
-
-        st.subheader(" Resume vs JD Match")
-
-        c1, c2 = st.columns(2)
-
-        with c1:
-
-            st.metric(
-                "Match Score",
-                f"{result['score']}%"
-            )
-
-            st.progress(result["score"] / 100)
-
-        with c2:
-
-            st.write("### Missing Skills")
-
-            if result["missing"]:
-
-                for skill in result["missing"]:
-
-                    st.error(skill)
-
+            if previous:
+                st.info(" Previous interview found.")
+                interview_mode = st.radio(
+                    "Interview Mode",
+                    [
+                        "🆕 Start New Interview",
+                        "▶ Continue Previous Interview"
+                    ],
+                    horizontal=True
+                )
             else:
-
-                st.success("No Missing Skills")
-
-    # -----------------------------------
-    # Load Previous Interview
-    # -----------------------------------
-
-    previous = load_session(name)
-
-    memory = load_memory(name)
-
-    if previous:
-
-        st.success(" Previous Interview Found!")
-
-        interview_mode = st.radio(
-
-            "Choose Interview Mode",
-
-            [
-
-                " Continue Previous Interview",
-
-                " Start New Interview"
-
-            ],
-
-            horizontal=True,
-
-            key="interview_mode"
-
-        )
-
-        if st.button("Continue"):
+                interview_mode = "🆕 Start New Interview"
 
             st.session_state.name = name
-
             st.session_state.role = role
-
             st.session_state.company = company
-
-            if interview_resume is not None:
-                st.session_state.resume_text = extract_resume(interview_resume)
-            else:
-                st.session_state.resume_text = ""
-
+            st.session_state.resume_text = resume_text
             st.session_state.voice_mode = voice_mode
-
             st.session_state.camera_mode = camera_mode
-
             st.session_state.coding_round = coding_round
 
-            if interview_mode == " Continue Previous Interview":
-
-                st.session_state.messages = previous.get(
-
-                    "messages",
-
-                    []
-
-                )
-
-                st.session_state.question_count = previous.get(
-
-                    "question_count",
-
-                    0
-
-                )
-
-                st.session_state.start_time = previous.get(
-
-                    "start_time",
-
-                    time.time()
-
-                )
-
+            if interview_mode == "▶ Continue Previous Interview" and previous:
+                st.session_state.messages = previous.get("messages", [])
+                st.session_state.question_count = previous.get("question_count", 0)
+                st.session_state.start_time = previous.get("start_time", time.time())
             else:
-
                 st.session_state.messages = []
-
                 st.session_state.question_count = 0
-
                 st.session_state.start_time = time.time()
 
             save_memory(
-
                 name,
-
                 {
-
                     "name": name,
-
                     "role": role,
-
                     "company": company,
-
                     "resume": st.session_state.resume_text
-
                 }
-
             )
 
             st.session_state.started = True
-
             st.rerun()
-
-    else:
-
-        st.session_state.name = name
-
-        st.session_state.role = role
-
-        st.session_state.company = company
-
-        if interview_resume is not None:
-            st.session_state.resume_text = extract_resume(interview_resume)
-        else:
-            st.session_state.resume_text = ""
-
-        st.session_state.messages = []
-
-        st.session_state.question_count = 0
-
-        st.session_state.start_time = time.time()
-
-        st.session_state.voice_mode = voice_mode
-
-        st.session_state.camera_mode = camera_mode
-
-        st.session_state.coding_round = coding_round
-
-        save_memory(
-            name,
-            {
-                "name": name,
-                "role": role,
-                "company": company,
-                "resume": st.session_state.resume_text
-            }
-        )
-
-        st.session_state.started = True
-
-        st.rerun()   
 
 # ===========================================================
 # INTERVIEW PAGE
@@ -556,11 +436,25 @@ else:
 
     st.sidebar.title("Interview Controls")
 
-    if st.sidebar.button(" Home"):
+if st.sidebar.button(" Home", use_container_width=True):
 
-        st.session_state.started = False
+    st.session_state.started = False
 
-        st.rerun()
+    st.session_state.messages = []
+
+    st.session_state.question_count = 0
+
+    st.session_state.start_time = None
+
+    st.session_state.generated_question = ""
+
+    st.session_state.voice_mode = False
+
+    st.session_state.camera_mode = False
+
+    st.session_state.coding_round = False
+
+    st.rerun()
 
     st.sidebar.write(
 
