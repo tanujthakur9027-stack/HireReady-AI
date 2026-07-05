@@ -98,6 +98,12 @@ During development, **OpenAI's ChatGPT** was used as an AI engineering assistant
 
 ---
 
+##   Deployment
+It Deployed on Render 
+Depolment Link- https://hireready-ai-yvge.onrender.com
+
+---
+
 ##  License
 
 This project is intended for educational, research, and hackathon purposes.
