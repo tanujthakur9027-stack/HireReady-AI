@@ -2,17 +2,10 @@ try:
     import cv2
     CV2_AVAILABLE = True
 except Exception:
-    cv2 = None
     CV2_AVAILABLE = False
+    cv2 = None
 
 from streamlit_webrtc import VideoTransformerBase
-
-if CV2_AVAILABLE:
-    face_detector = cv2.CascadeClassifier(
-        cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-    )
-else:
-    face_detector = None
 
 
 class VideoProcessor(VideoTransformerBase):
@@ -26,30 +19,21 @@ class VideoProcessor(VideoTransformerBase):
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        faces = face_detector.detectMultiScale(
-            gray,
-            scaleFactor=1.2,
-            minNeighbors=5,
-            minSize=(60, 60)
+        face_detector = cv2.CascadeClassifier(
+            cv2.data.haarcascades +
+            "haarcascade_frontalface_default.xml"
         )
 
+        faces = face_detector.detectMultiScale(gray)
+
         for (x, y, w, h) in faces:
+
             cv2.rectangle(
                 img,
                 (x, y),
-                (x + w, y + h),
-                (0, 255, 0),
+                (x+w, y+h),
+                (0,255,0),
                 2
             )
-
-        cv2.putText(
-            img,
-            f"Faces : {len(faces)}",
-            (20, 40),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.8,
-            (0, 255, 0),
-            2
-        )
 
         return img
