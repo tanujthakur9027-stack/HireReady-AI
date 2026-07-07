@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: hireready-ai
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: true
+        description: "Google AI Studio Developer API Key"
+      - key: LLM_API_KEY
+        sync: true
+        description: "API Key for Cognee LLM operations (use same Gemini key)"
+      - key: LLM_PROVIDER
+        value: "gemini"
+      - key: LLM_MODEL
+        value: "gemini/gemini-2.5-flash"
+      - key: GOOGLE_API_KEY
+        sync: true
+        description: "Google API Key (use same Gemini key)"
+      - key: COGNEE_SKIP_CONNECTION_TEST
+        value: "true"
+      - key: SYSTEM_ROOT_DIRECTORY
+        value: "/opt/render/project/src/data/cognee_system"
+      - key: DATA_ROOT_DIRECTORY
+        value: "/opt/render/project/src/data/cognee_data"
+      - key: EMBEDDING_PROVIDER
+        value: "gemini"
+      - key: EMBEDDING_MODEL
+        value: "gemini/gemini-embedding-001"
+      - key: EMBEDDING_API_KEY
+        sync: true
+        description: "Gemini embedding API key (use same Gemini key)"
+      - key: EMBEDDING_DIMENSIONS
+        value: "3072"

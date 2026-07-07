@@ -1,79 +1,43 @@
-import re
+import json
+from pydantic import BaseModel, Field
+from services.gemini_service import get_client
 
-COMMON_SKILLS = [
+class JDMatcherSchema(BaseModel):
+    score: int = Field(..., description="Semantic match score out of 100 between resume and job description")
+    matched: list[str] = Field(..., description="Skills required in the JD that are found in the resume")
+    missing: list[str] = Field(..., description="Crucial skills required in the JD that are missing in the resume")
+    alignment_summary: str = Field(..., description="Detailed explanation of how well the candidate aligns with the role")
+    strengths_for_role: list[str] = Field(..., description="Top candidate strengths that map directly to the JD")
+    gaps_for_role: list[str] = Field(..., description="Gaps in candidate's experience or skills for this specific JD")
 
-    "python","java","c++","javascript","react","node",
-
-    "express","django","flask","fastapi",
-
-    "sql","mysql","mongodb","postgresql",
-
-    "aws","azure","gcp",
-
-    "docker","kubernetes",
-
-    "tensorflow","pytorch",
-
-    "machine learning","deep learning",
-
-    "git","github",
-
-    "html","css"
-
-]
-
-
-def extract_skills(text):
-
-    text = text.lower()
-
-    found = []
-
-    for skill in COMMON_SKILLS:
-
-        if skill in text:
-
-            found.append(skill)
-
-    return found
-
+PROMPT = """
+You are an expert Talent Acquisition Consultant.
+Analyze the candidate's resume text against the provided Job Description (JD).
+1. Compare the core tech stack, experience, and responsibilities.
+2. Determine the semantic match score (0 to 100) based on alignment.
+3. Identify which skills required in the JD are present (matched) and which are missing (missing).
+4. Summarize how well the candidate aligns with the role, highlighting direct strengths and key gaps.
+"""
 
 def match_resume(resume, jd):
-
-    resume_skills = extract_skills(resume)
-
-    jd_skills = extract_skills(jd)
-
-    matched = list(set(resume_skills) & set(jd_skills))
-
-    missing = list(set(jd_skills) - set(resume_skills))
-
-    if len(jd_skills) == 0:
-
-        score = 0
-
-    else:
-
-        score = int(
-
-            len(matched)
-
-            /
-
-            len(jd_skills)
-
-            *
-
-            100
-
+    client = get_client()
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"{PROMPT}\n\nResume:\n{resume}\n\nJob Description:\n{jd}",
+            config={
+                "response_mime_type": "application/json",
+                "response_schema": JDMatcherSchema
+            }
         )
-
-    return {
-
-        "score": score,
-
-        "matched": matched,
-
-        "missing": missing
-
-    }
+        return json.loads(response.text)
+    except Exception as e:
+        # Fallback in case of API issues
+        return {
+            "score": 50,
+            "matched": [],
+            "missing": ["Could not parse due to API error"],
+            "alignment_summary": f"An error occurred during JD matching: {str(e)}",
+            "strengths_for_role": [],
+            "gaps_for_role": ["Failed to extract gaps"]
+        }

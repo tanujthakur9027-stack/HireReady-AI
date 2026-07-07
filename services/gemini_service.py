@@ -113,15 +113,15 @@ Then ask ONLY ONE interview question.
 
 
 def ask_ai(message, profile):
-
     global chat
-
     if chat is None:
-
         return start_chat(profile)
-
     response = chat.send_message(message)
-
     return response.text
+
+def reset_chat():
+    global chat
+    chat = None
+
 def get_client():
     return client
